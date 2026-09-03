@@ -1,13 +1,9 @@
 #pragma once
-#include <cstdint>
-#include <unordered_map>
-#include <string>
 
 namespace TreeCapacitor {
-    static constexpr int    MAX_CHARGE       = 10000;
-    static constexpr int    CHARGE_RATE      = 5;
-    static constexpr int    DISCHARGE_RATE   = 2;
-    static constexpr float  SCAN_RADIUS      = 6.0f;
+    static constexpr int MAX_CHARGE     = 10000;
+    static constexpr int CHARGE_RATE    = 5;
+    static constexpr int DISCHARGE_RATE = 2;
 
     struct CapacitorNode {
         int charge = 0;
@@ -16,6 +12,6 @@ namespace TreeCapacitor {
 
     void Init();
     void Shutdown();
-    void OnTick(void* levelPtr);          // hooked into Level::tick
-    void OnBlockPlace(void* blockSourcePtr, void* posPtr, void* blockPtr);
+    void OnTick(void* level, bool isStorm);
+    void OnBlockPlace(int blockId, int x, int y, int z);
 }
