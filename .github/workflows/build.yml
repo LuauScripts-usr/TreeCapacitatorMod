@@ -1,21 +1,25 @@
-name: Build .so
-on: [push]
+name: Build TreeCapacitor 1.26.33.1
+on: [push, workflow_dispatch]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup NDK
-        uses: nttld/setup-ndk@v1
+
+      - uses: nttld/setup-ndk@v1
         id: ndk
         with:
           ndk-version: r26b
-      - name: Build
+
+      - name: Build arm64-v8a
         run: |
           chmod +x scripts/build.sh
-          NDK_PATH="${{ steps.ndk.outputs.ndk-path }}" scripts/build.sh
-      - name: Upload artifact
+          NDK_PATH="${{ steps.ndk.outputs.ndk-path }}" bash scripts/build.sh
+
+      - name: Upload .so
         uses: actions/upload-artifact@v4
         with:
-          name: libtree_capacitor.so
+          name: libtree_capacitor-mc1.26.33.1-arm64.so
           path: build-android/libtree_capacitor.so
+          retention-days: 90
