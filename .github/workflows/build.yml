@@ -1,0 +1,21 @@
+name: Build .so
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        id: ndk
+        with:
+          ndk-version: r26b
+      - name: Build
+        run: |
+          chmod +x scripts/build.sh
+          NDK_PATH="${{ steps.ndk.outputs.ndk-path }}" scripts/build.sh
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libtree_capacitor.so
+          path: build-android/libtree_capacitor.so
