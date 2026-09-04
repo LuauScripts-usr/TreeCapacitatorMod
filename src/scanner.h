@@ -14,23 +14,32 @@ namespace Scanner {
         size_t size;
     };
 
-    // Finds the base address and size of libminecraftpe.so in memory
+    // Finds the base address and size of a module in memory
     inline ModuleInfo GetModuleInfo(const char* moduleName) {
         ModuleInfo info = {0, 0};
-        dl_iterate_phdr([](struct dl_phdr_info *info, size_t size, void *data) {
-            if (info->dlpi_name && strstr(info->dlpi_name, moduleName)) {
-                auto *modInfo = static_cast<ModuleInfo*>(data);
-                modInfo->base = info->dlpi_addr;
-                for (int i = 0; i < info->dlpi_phnum; i++) {
-                    if (info->dlpi_phdr[i].p_type == PT_LOAD) {
-                        size_t end = info->dlpi_phdr[i].p_vaddr + info->dlpi_phdr[i].p_memsz;
-                        if (end > modInfo->size) modInfo->size = end;
+        
+        struct CallbackData {
+            const char* name;
+            ModuleInfo* result;
+        };
+        
+        CallbackData data = {moduleName, &info};
+        
+        dl_iterate_phdr([](struct dl_phdr_info *phdr_info, size_t size, void *userdata) -> int {
+            auto* cbdata = static_cast<CallbackData*>(userdata);
+            if (phdr_info->dlpi_name && strstr(phdr_info->dlpi_name, cbdata->name)) {
+                cbdata->result->base = phdr_info->dlpi_addr;
+                for (int i = 0; i < phdr_info->dlpi_phnum; i++) {
+                    if (phdr_info->dlpi_phdr[i].p_type == PT_LOAD) {
+                        size_t end = phdr_info->dlpi_phdr[i].p_vaddr + phdr_info->dlpi_phdr[i].p_memsz;
+                        if (end > cbdata->result->size) cbdata->result->size = end;
                     }
                 }
-                return 1; 
+                return 1;
             }
             return 0;
-        }, &info);
+        }, &data);
+        
         return info;
     }
 
