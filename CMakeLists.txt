@@ -4,10 +4,6 @@ project(TreeCapacitor CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT DEFINED DOBBY_INCLUDE_DIR OR NOT DEFINED DOBBY_LIBRARY)
-  message(FATAL_ERROR "Pass -DDOBBY_INCLUDE_DIR=... and -DDOBBY_LIBRARY=...")
-endif()
-
 add_library(tree_capacitor SHARED
     src/Main.cpp
     src/tree_capacitor.cpp
@@ -15,7 +11,6 @@ add_library(tree_capacitor SHARED
 
 target_include_directories(tree_capacitor PRIVATE
     src
-    ${DOBBY_INCLUDE_DIR}
 )
 
 target_compile_definitions(tree_capacitor PRIVATE
@@ -26,7 +21,6 @@ target_compile_definitions(tree_capacitor PRIVATE
 )
 
 target_link_libraries(tree_capacitor PRIVATE
-    ${DOBBY_LIBRARY}
     log
     dl
 )
