@@ -17,39 +17,6 @@ jobs:
         with:
           ndk-version: r26b
 
-      - name: Build Dobby (arm64-v8a)
-        run: |
-          echo "Cloning Dobby..."
-          git clone --depth 1 https://github.com/jmpews/Dobby.git external/Dobby
-          
-          echo "Patching Dobby assembly syntax for Android NDK r26..."
-          # Replace iOS Mach-O relocations with ELF/LLVM relocations
-          find external/Dobby -name "*.asm" -type f -exec sed -i 's/@PAGE/:pg_hi21:/g; s/@PAGEOFF/:lo12:/g' {} +
-          
-          echo "Configuring Dobby with Ninja..."
-          cmake -B external/Dobby/build -S external/Dobby \
-            -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE=${{ steps.ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake \
-            -DANDROID_ABI=arm64-v8a \
-            -DANDROID_PLATFORM=android-26 \
-            -DANDROID_STL=c++_static \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DDOBBY_GENERATE_SHARED=ON \
-            -DDOBBY_DEBUG=OFF
-
-          echo "Building Dobby..."
-          cmake --build external/Dobby/build --config Release
-
-      - name: Locate Dobby outputs
-        id: dobby
-        run: |
-          LIB=$(find external/Dobby -name 'libdobby.so' | head -n 1)
-          INC=$(find external/Dobby -name 'dobby.h' | head -n 1 | xargs dirname)
-          echo "Found lib: $LIB"
-          echo "Found inc: $INC"
-          echo "lib=$LIB" >> $GITHUB_OUTPUT
-          echo "inc=$INC" >> $GITHUB_OUTPUT
-
       - name: Configure and build mod
         run: |
           echo "Configuring TreeCapacitor..."
@@ -59,9 +26,7 @@ jobs:
             -DANDROID_ABI=arm64-v8a \
             -DANDROID_PLATFORM=android-26 \
             -DANDROID_STL=c++_static \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DDOBBY_INCLUDE_DIR=${{ steps.dobby.outputs.inc }} \
-            -DDOBBY_LIBRARY=${{ steps.dobby.outputs.lib }}
+            -DCMAKE_BUILD_TYPE=Release
           
           echo "Building TreeCapacitor..."
           cmake --build build --config Release
