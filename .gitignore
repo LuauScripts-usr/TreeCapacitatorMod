@@ -1,0 +1,50 @@
+```
+# CMake build artifacts
+build/
+CMakeCache.txt
+CMakeFiles/
+
+# Compiled objects and binaries
+*.o
+*.obj
+*.so
+*.a
+*.dll
+*.exe
+*.bin
+*.out
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Editors and IDEs
+.vscode/
+.idea/
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# System files
+.DS_Store
+Thumbs.db
+```

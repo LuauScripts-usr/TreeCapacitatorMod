@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <dlfcn.h>
 #include <cstdint>
+#include <cstdlib>
+#include <unistd.h>
 #include <sys/mman.h>
 #include <android/log.h>
 #include "tree_capacitor.h"
