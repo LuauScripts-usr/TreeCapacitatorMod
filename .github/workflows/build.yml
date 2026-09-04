@@ -22,6 +22,10 @@ jobs:
           echo "Cloning Dobby..."
           git clone --depth 1 https://github.com/jmpews/Dobby.git external/Dobby
           
+          echo "Patching Dobby assembly syntax for Android NDK r26..."
+          # Replace iOS Mach-O relocations with ELF/LLVM relocations
+          find external/Dobby -name "*.asm" -type f -exec sed -i 's/@PAGE/:pg_hi21:/g; s/@PAGEOFF/:lo12:/g' {} +
+          
           echo "Configuring Dobby with Ninja..."
           cmake -B external/Dobby/build -S external/Dobby \
             -G Ninja \
