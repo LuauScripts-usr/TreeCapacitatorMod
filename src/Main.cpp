@@ -2,9 +2,9 @@
 #include <dlfcn.h>
 #include <cstdint>
 #include <android/log.h>
-#include "dobby.h"
 #include "tree_capacitor.h"
 #include "Offsets_1_26_33.h"
+#include "hook.h"
 
 #define LOG_TAG "TreeCap"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
@@ -47,15 +47,14 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
     uintptr_t base = reinterpret_cast<uintptr_t>(mcLib);
 
-    int rc1 = DobbyHook(reinterpret_cast<void*>(base + OFF_LEVEL_TICK),
-                        reinterpret_cast<void*>(Hook_LevelTick),
-                        reinterpret_cast<void**>(&orig_LevelTick));
-    int rc2 = DobbyHook(reinterpret_cast<void*>(base + OFF_SET_BLOCK),
-                        reinterpret_cast<void*>(Hook_SetBlock),
-                        reinterpret_cast<void**>(&orig_SetBlock));
-
-    if (rc1 != 0) LOGE("Failed to hook Level::tick (rc=%d)", rc1);
-    if (rc2 != 0) LOGE("Failed to hook BlockSource::setBlock (rc=%d)", rc2);
+    // Install hooks using our minimal ARM64 hook
+    hook_arm64(reinterpret_cast<void*>(base + OFF_LEVEL_TICK),
+               reinterpret_cast<void*>(Hook_LevelTick),
+               reinterpret_cast<void**>(&orig_LevelTick));
+               
+    hook_arm64(reinterpret_cast<void*>(base + OFF_SET_BLOCK),
+               reinterpret_cast<void*>(Hook_SetBlock),
+               reinterpret_cast<void**>(&orig_SetBlock));
 
     TreeCapacitor::Init();
     LOGI("TreeCapacitor hooks active");
